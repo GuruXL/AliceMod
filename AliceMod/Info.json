@@ -1,0 +1,11 @@
+{
+  "Id": "AliceMod",
+  "DisplayName": "Alice Mod",
+  "Author": "Guru",
+  "Version": "0.0.1",
+  "ManagerVersion": "0.22.5.0",
+  "Requirements": [],
+  "LoadAfter": [],
+  "AssemblyName": "AliceMod.dll",
+  "EntryMethod": "AliceMod.Main.Load"
+}
