@@ -7,10 +7,32 @@ namespace AliceMod
     public static class ColorLoop
     {
         public static IColorSetter colorSetter;
+        public static IColorSetter BG_colorSetter;
 
         public static bool isRGBActive = false;
         public static bool randomColors = false;
 
+        public static IEnumerator BG_RGBColorLoop()
+        {
+            yield return null;
+
+            float t = 0f;
+            while (true)
+            {
+                float r = Mathf.PingPong(t, 1f);
+                float g = Mathf.PingPong(t + 0.33f, 1f);
+                float b = Mathf.PingPong(t + 0.66f, 1f);
+
+                Color rgbColor = new Color(r, g, b);
+
+                BG_colorSetter?.SetColor(rgbColor);
+
+                //Main.Logger.Log($"Color: {rgbColor}");
+
+                yield return null;
+                t += Time.deltaTime / Main.settings.BG_RGB_Duration;
+            }
+        }
         public static IEnumerator RGBColorLoop()
         {
             yield return null;

@@ -18,6 +18,9 @@ namespace AliceMod
         public static Settings settings;
         public static GameObject ScriptManager;
         public static LightController lightController;
+        public static SkyController skyController;
+        public static UIcontroller uiController;
+        public static MapChangeManager mapChangeManager;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
@@ -41,52 +44,11 @@ namespace AliceMod
         }
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("Get Lights", RGUIStyle.button, GUILayout.Width(182)))
+            GUILayout.BeginHorizontal(GUILayout.Width(256));
             {
-                lightController.GetLights();
-            }
-            //GUILayout.BeginVertical();
-            //settings.Lights_Intensity = RGUI.SliderFloat(settings.Lights_Intensity, 0f, 200000f, 4000f, 90, "Light Intensity");
-            //settings.Lights_Area = RGUI.SliderFloat(settings.Lights_Area, 0f, 200f, 80f, 90, "Light Area");
-            //GUILayout.EndVertical();
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            if (RGUI.Button(ColorLoop.isRGBActive, "RGB Lights", GUILayout.Width(156)))
-            {
-                ColorLoop.isRGBActive = !ColorLoop.isRGBActive;
-
-                if (ColorLoop.isRGBActive)
-                {
-                    lightController.StartRGBRoutine();
-                }
-                else
-                {
-                    lightController.StopRGBRoutine();
-                    lightController.ResetDefaultLightValues();
-                }
-            }
-            if (RGUI.Button(ColorLoop.randomColors, "Random Colors", GUILayout.Width(156)))
-            {
-                ColorLoop.randomColors = !ColorLoop.randomColors;
-
-                if (ColorLoop.isRGBActive)
-                {
-                    lightController.StopRGBRoutine();
-                    lightController.StartRGBRoutine();
-                }
+                settings.BG_RGB_Duration = RGUI.SliderFloat(settings.BG_RGB_Duration, 1.0f, 10.0f, 3.0f, 128, "Background RGB duration");
             }
             GUILayout.EndHorizontal();
-
-            GUILayout.BeginVertical(GUILayout.Width(256));
-            if (ColorLoop.isRGBActive)
-            {
-                settings.RGB_Duration = RGUI.SliderFloat(settings.RGB_Duration, 1.0f, 10.0f, 2.0f, 96, "RGB duration");
-            }
-            GUILayout.EndVertical();
         }
         private static void OnSaveGUI(UnityModManager.ModEntry modEntry)
         {
@@ -107,8 +69,11 @@ namespace AliceMod
                     harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());       
                     ScriptManager = new GameObject("AliceMod");
                     lightController = ScriptManager.AddComponent<LightController>();
+                    skyController = ScriptManager.AddComponent<SkyController>();
+                    uiController = ScriptManager.AddComponent<UIcontroller>();
+                    mapChangeManager = ScriptManager.AddComponent<MapChangeManager>();
                     Object.DontDestroyOnLoad(ScriptManager);
-                    //AssetLoader.LoadBundles();
+                    AssetLoader.LoadBundles();
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +98,7 @@ namespace AliceMod
 
                 if (ScriptManager != null)
                 {
-                    //AssetLoader.UnloadAssetBundle();
+                    AssetLoader.UnloadAssetBundle();
                     Object.Destroy(ScriptManager);
                     ScriptManager = null;
                 }

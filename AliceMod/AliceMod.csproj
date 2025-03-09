@@ -123,9 +123,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AliceMod\ColorLoop.cs" />
+    <Compile Include="AliceMod\Utils\AssetLoader.cs" />
+    <Compile Include="AliceMod\Utils\ColorLoop.cs" />
+    <Compile Include="AliceMod\Interfaces\IColorSetter.cs" />
     <Compile Include="AliceMod\LightController.cs" />
     <Compile Include="AliceMod\Main.cs" />
+    <Compile Include="AliceMod\MapChangeManger.cs" />
+    <Compile Include="AliceMod\SkyController.cs" />
+    <Compile Include="AliceMod\UI\UIController.cs" />
+    <Compile Include="AliceMod\UI\UIExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RapidGUI\Button.cs" />
     <Compile Include="RapidGUI\Field.cs" />
