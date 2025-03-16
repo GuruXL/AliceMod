@@ -118,20 +118,28 @@
     <Reference Include="UnityEngine.UIModule">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.VFXModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityEngine.VFXModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityModManager">
       <HintPath>..\..\..\..\..\..\Games\Skater XL 1.2.2.8\SkaterXL_Data\Managed\UnityModManager\UnityModManager.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AliceMod\FX\MeshTrail.cs" />
     <Compile Include="AliceMod\Utils\AssetLoader.cs" />
     <Compile Include="AliceMod\Utils\ColorLoop.cs" />
     <Compile Include="AliceMod\Interfaces\IColorSetter.cs" />
-    <Compile Include="AliceMod\LightController.cs" />
+    <Compile Include="AliceMod\Controllers\LightController.cs" />
     <Compile Include="AliceMod\Main.cs" />
     <Compile Include="AliceMod\MapChangeManger.cs" />
-    <Compile Include="AliceMod\SkyController.cs" />
+    <Compile Include="AliceMod\Controllers\SkyController.cs" />
     <Compile Include="AliceMod\UI\UIController.cs" />
     <Compile Include="AliceMod\UI\UIExtensions.cs" />
+    <Compile Include="AliceMod\FX\RGBParticles.cs" />
+    <Compile Include="AliceMod\Utils\MaterialUtil.cs" />
+    <Compile Include="AliceMod\Utils\PositionUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RapidGUI\Button.cs" />
     <Compile Include="RapidGUI\Field.cs" />

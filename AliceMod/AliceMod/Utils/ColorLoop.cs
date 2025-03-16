@@ -30,7 +30,8 @@ namespace AliceMod
                 //Main.Logger.Log($"Color: {rgbColor}");
 
                 yield return null;
-                t += Time.deltaTime / Main.settings.BG_RGB_Duration;
+                float duration = Mathf.Max(0.1f, Main.settings.BG_RGB_Duration);
+                t += Time.deltaTime / duration;
             }
         }
         public static IEnumerator RGBColorLoop()
@@ -51,7 +52,8 @@ namespace AliceMod
                 //Main.Logger.Log($"Color: {rgbColor}");
 
                 yield return null;
-                t += Time.deltaTime / Main.settings.RGB_Duration;
+                float duration = Mathf.Max(0.1f, Main.settings.RGB_Duration);
+                t += Time.deltaTime / duration;
             }
         }
 
@@ -76,7 +78,8 @@ namespace AliceMod
                 // transition from startColor to endColor
                 while (t < 1)
                 {
-                    t += Time.deltaTime / Main.settings.RGB_Duration;
+                    float duration = Mathf.Max(0.1f, Main.settings.RGB_Duration);
+                    t += Time.deltaTime / duration;
                     Color currentColor = Color.Lerp(startColor, endColor, t);
 
                     colorSetter?.SetColor(currentColor);

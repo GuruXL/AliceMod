@@ -19,8 +19,10 @@ namespace AliceMod
         public static GameObject ScriptManager;
         public static LightController lightController;
         public static SkyController skyController;
-        public static UIcontroller uiController;
+        public static UIController uiController;
         public static MapChangeManager mapChangeManager;
+        public static RGBParticles rgbParticles;
+        public static MeshTrail meshTrail;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
@@ -46,7 +48,7 @@ namespace AliceMod
         {
             GUILayout.BeginHorizontal(GUILayout.Width(256));
             {
-                settings.BG_RGB_Duration = RGUI.SliderFloat(settings.BG_RGB_Duration, 1.0f, 10.0f, 3.0f, 128, "Background RGB duration");
+                settings.BG_RGB_Duration = RGUI.SliderFloat(settings.BG_RGB_Duration, 0.1f, 10.0f, 3.0f, 186, "Background RGB duration");
             }
             GUILayout.EndHorizontal();
         }
@@ -70,8 +72,10 @@ namespace AliceMod
                     ScriptManager = new GameObject("AliceMod");
                     lightController = ScriptManager.AddComponent<LightController>();
                     skyController = ScriptManager.AddComponent<SkyController>();
-                    uiController = ScriptManager.AddComponent<UIcontroller>();
+                    uiController = ScriptManager.AddComponent<UIController>();
                     mapChangeManager = ScriptManager.AddComponent<MapChangeManager>();
+                    rgbParticles = ScriptManager.AddComponent<RGBParticles>();
+                    meshTrail = ScriptManager.AddComponent<MeshTrail>();
                     Object.DontDestroyOnLoad(ScriptManager);
                     AssetLoader.LoadBundles();
                 }
