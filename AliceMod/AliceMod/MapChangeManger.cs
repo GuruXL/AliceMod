@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Rewired;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace AliceMod
 {
@@ -9,6 +11,10 @@ namespace AliceMod
         private void Awake()
         {
             LevelManager.Instance.OnLevelChanged += HandleLevelChanged;
+        }
+        private void Start()
+        {
+            StartCoroutine(GetFirstSceneLights());
         }
         private void OnDestroy()
         {
@@ -22,6 +28,12 @@ namespace AliceMod
             {
                 Main.lightController.StopRGBRoutine();
             }
+        }
+        private IEnumerator GetFirstSceneLights()
+        {
+            yield return new WaitUntil(() => SceneManager.GetActiveScene().isLoaded);
+            Main.lightController.GetLights();
+            yield return null;
         }
     }
 }

@@ -46,6 +46,7 @@ namespace AliceMod
             UpdateSkyState();
         }
 
+        #region Create SkyVolume
         private void CreateSkyVolume()
         {
             skyVolumeObj = new GameObject("SkyVolume");
@@ -75,7 +76,7 @@ namespace AliceMod
         {
             skyVolume = skyVolumeObj.AddComponent<Volume>();
         }
-        private void  AddVolumeProfile()
+        private void AddVolumeProfile()
         {
             skyProfile = new VolumeProfile();
             skyVolume.profile = skyProfile;
@@ -120,6 +121,7 @@ namespace AliceMod
             whiteBalance.temperature.Override(Main.settings.Sky_Temp);
             whiteBalance.temperature.Override(Main.settings.Sky_Tint);
         }
+        #endregion
 
         private void UpdateSettings()
         {
@@ -144,8 +146,13 @@ namespace AliceMod
                     break;
                 case none:
                     break;
+                default:
+                    Main.Logger.Log("failed to update skybox");
+                    break;
             }
         }
+
+        #region Sky Updates
         private void UpdateVolume()
         {
             if (skyVolume == null)
@@ -191,7 +198,7 @@ namespace AliceMod
         }
         private void UpdateIndirectLight()
         {
-            if (indirectLight == null) 
+            if (indirectLight == null)
                 return;
 
             if (last_IndirectDiffuse != Main.settings.Sky_IndirectDiffuse)
@@ -221,5 +228,6 @@ namespace AliceMod
                 last_Tint = Main.settings.Sky_Tint;
             }
         }
+        #endregion
     }
 }

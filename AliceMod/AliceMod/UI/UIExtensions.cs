@@ -47,5 +47,13 @@ namespace AliceMod
                 return Color.white;
             }
         }
+        public static void CenteredLabel(string label)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.Label($"<i><b>{label}</b></i>", GUILayout.ExpandWidth(true));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
     }
 }

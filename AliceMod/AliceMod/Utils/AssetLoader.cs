@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System;
 using GameManagement;
+using UnityEngine.VFX;
 
 namespace AliceMod
 {
@@ -11,7 +12,11 @@ namespace AliceMod
     {
         public static AssetBundle bundle;
         public static Cubemap Sky_shanghai;
-        public static string bundlePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "aliceskys");
+        public static VisualEffectAsset RGB_Trail_asset;
+        public static Shader Mesh_HoloShader;
+        public static Material Mesh_HoloMaterial;
+        public static Texture2D Mesh_Holotexture;
+        public static string bundlePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "aliceassets");
 
         public static bool assetsLoaded { get; private set; } = false;
 
@@ -30,10 +35,7 @@ namespace AliceMod
         {
             AssetBundleCreateRequest requestFXbundle = AssetBundle.LoadFromFileAsync(bundlePath);
 
-            while (!requestFXbundle.isDone)
-            {
-                yield return null;
-            }
+            yield return new WaitUntil(() => requestFXbundle.isDone);
 
             bundle = requestFXbundle.assetBundle;
 
@@ -44,8 +46,12 @@ namespace AliceMod
             }
 
             Sky_shanghai = bundle.LoadAsset<Cubemap>("shanghai4k");
+            RGB_Trail_asset = bundle.LoadAsset<VisualEffectAsset>("RGBTrailV2");
+            Mesh_HoloShader = bundle.LoadAsset<Shader>("MeshTrail");
+            Mesh_HoloMaterial = bundle.LoadAsset<Material>("MeshTrailv2");
+            Mesh_Holotexture = bundle.LoadAsset<Texture2D>("hologramtexture");
 
-            if (Sky_shanghai != null)
+            if (Sky_shanghai != null && RGB_Trail_asset != null)
             {
                 assetsLoaded = true;
             }
