@@ -23,6 +23,7 @@ namespace AliceMod
         public static MapChangeManager mapChangeManager;
         public static RGBParticles rgbParticles;
         public static MeshTrail meshTrail;
+        public static GrindSparks grindSparks;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
@@ -76,6 +77,7 @@ namespace AliceMod
                     mapChangeManager = ScriptManager.AddComponent<MapChangeManager>();
                     rgbParticles = ScriptManager.AddComponent<RGBParticles>();
                     meshTrail = ScriptManager.AddComponent<MeshTrail>();
+                    grindSparks = ScriptManager.AddComponent<GrindSparks>();
                     Object.DontDestroyOnLoad(ScriptManager);
                     AssetLoader.LoadBundles();
                 }

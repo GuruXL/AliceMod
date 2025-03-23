@@ -38,22 +38,22 @@ namespace AliceMod
         public float Sky_IndirectSpecular = 1.0f;
         public float Sky_Temp = 0.0f;
         public float Sky_Tint = 0.0f;
+        public string Sky_State = "";
+        public bool Sky_CustomSky_Enabled = false;
 
-        public string SkyState = "";
-        public bool isCustomSkyactive = false;
-
-        public bool MeshTrail_Enabled = false;
-        public bool MeshTrail_RandomColours = false;
-
-        public float Mesh_ActiveTime = 1.5f;
         public float Mesh_DestroyDelay = 2.0f;
-        public float Mesh_RefreshRate = 0.1f;
-
-        public float Shader_Float_Rate = 1.0f;
-        public float Shader_Float_RefreshRate = 0.75f;
-        public float Shader_ColorIntensity = 1.0f;
-
+        public float Mesh_RefreshRate = 0.2f;
+        public float Shader_Float_FadeDuration = 1.0f;
+        public float Shader_ColorIntensity = 0.55f;
         public float Velocity_Threshold = 1.0f;
+        public float Shader_BaseColor_R = 0.0f;
+        public float Shader_BaseColor_G = 0.80f;
+        public float Shader_BaseColor_B = 1.0f;
+        public float Shader_DissolveColor_R = 0.85f;
+        public float Shader_DissolveColor_G = 0.20f;
+        public float Shader_DissolveColor_B = 0.90f;
+
+        public bool FX_Sparks_Enabled = false;
 
         public void ResetLightSettings()
         {

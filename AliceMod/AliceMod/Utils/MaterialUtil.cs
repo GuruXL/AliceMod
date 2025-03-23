@@ -26,6 +26,15 @@ namespace AliceMod
             }
             mat.SetFloat(shaderFloatVar, goal);
         }
+        public static void SetMaterialColor(Color newColor, Material mat, string shadercolorName, float intensity) 
+        {
+            Color color = new Color(
+                newColor.r * intensity,
+                newColor.g * intensity,
+                newColor.b * intensity
+                );
+            mat.SetColor(shadercolorName, color);
+        }
         public static void SetRandomMaterialColor(Material mat, string shadercolorName, float intensity)
         {
             Color color = GetRandomColor(intensity);

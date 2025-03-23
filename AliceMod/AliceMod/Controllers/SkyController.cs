@@ -139,7 +139,7 @@ namespace AliceMod
             if(hdriSky == null)
                 return;
 
-            switch (Main.settings.SkyState)
+            switch (Main.settings.Sky_State)
             {
                 case shanghai_sky:
                     hdriSky.hdriSky.Override(AssetLoader.Sky_shanghai);

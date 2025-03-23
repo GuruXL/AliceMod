@@ -35,7 +35,9 @@ namespace AliceMod
         readonly UItab Lights_Normal_Tab = new UItab(true, "Light Settings", 13);
         readonly UItab Lights_Direct_Tab = new UItab(true, "Sun Settings", 13);
         readonly UItab Sky_Tab = new UItab(true, "Skys", 14);
-        readonly UItab VFX_Tab = new UItab(true, "VFX", 14);
+        readonly UItab FX_Tab = new UItab(true, "FX", 14);
+        readonly UItab FX_GhostTab = new UItab(true, "Ghost Trail", 14);
+        readonly UItab FX_GrindSparks = new UItab(true, "Grind Sparks", 14);
         private void Tabs(UItab obj, string color = "#e6ebe8")
         {
             if (GUILayout.Button($"<size={obj.font}><color={color}>" + (obj.isClosed ? "○" : "●") + obj.text + "</color>" + "</size>", "Label"))
@@ -137,8 +139,7 @@ namespace AliceMod
             MainUI();
             LightsUI();
             SkyUI();
-            VFXUI();
-
+            FXUI();
         }
         public void SetColor(Color color)
         {
@@ -147,7 +148,7 @@ namespace AliceMod
         private void MainUI()
         {
             GUILayout.Label("Alice Mod v0.0.2");
-        }    
+        }
         private void LightsUI()
         {
             Tabs(Lights_Tab, UIextensions.TabColorSwitch(Lights_Tab));
@@ -211,7 +212,7 @@ namespace AliceMod
                             }
                         }
                     }
-                    GUILayout.EndHorizontal();   
+                    GUILayout.EndHorizontal();
                     if (ColorLoop.isRGBActive)
                     {
                         GUILayout.BeginVertical("Box");
@@ -238,8 +239,8 @@ namespace AliceMod
                             }
                             GUILayout.EndVertical();
                         }
-                        GUILayout.EndVertical();          
-                    }              
+                        GUILayout.EndVertical();
+                    }
                 }
                 GUILayout.EndVertical();
 
@@ -251,28 +252,22 @@ namespace AliceMod
                         GUILayout.BeginVertical();
                         {
                             Main.settings.Lights_IntensityMultiplyer = RGUI.SliderFloat(Main.settings.Lights_IntensityMultiplyer, 1.0f, 100.0f, 1.0f, 128, "Intensity Multiplier");
-                            GUILayout.Space(4);
                             Main.settings.Lights_Dimmer = RGUI.SliderFloat(Main.settings.Lights_Dimmer, 0.0f, 20.0f, 1.0f, 96, "Dimmer");
-                            GUILayout.Space(4);
                             Main.settings.Lights_Range = RGUI.SliderFloat(Main.settings.Lights_Range, 0.0f, 20.0f, 8.0f, 96, "Range");
-                            GUILayout.Space(4);
                             Main.settings.Lights_Volumetric = RGUI.SliderFloat(Main.settings.Lights_Volumetric, 0.0f, 20.0f, 1.0f, 96, "Volumetrics");
 
                         }
                         GUILayout.EndVertical();
-                        GUILayout.Space(4);
                         GUILayout.Label("<b>Colour</b>");
                         GUILayout.BeginVertical();
                         {
                             Main.settings.Lights_Color_R = RGUI.SliderFloat(Main.settings.Lights_Color_R, 0.0f, 1.0f, 1.0f, 24, "R");
-                            GUILayout.Space(2);
                             Main.settings.Lights_Color_G = RGUI.SliderFloat(Main.settings.Lights_Color_G, 0.0f, 1.0f, 1.0f, 24, "G");
-                            GUILayout.Space(2);
                             Main.settings.Lights_Color_B = RGUI.SliderFloat(Main.settings.Lights_Color_B, 0.0f, 1.0f, 1.0f, 24, "B");
                         }
                         GUILayout.EndVertical();
                     }
-                    GUILayout.EndVertical();                
+                    GUILayout.EndVertical();
                 }
 
                 Tabs(Lights_Direct_Tab, UIextensions.TabColorSwitch(Lights_Direct_Tab));
@@ -283,18 +278,14 @@ namespace AliceMod
                         GUILayout.BeginVertical();
                         {
                             Main.settings.Direct_IntensityMultiplyer = RGUI.SliderFloat(Main.settings.Direct_IntensityMultiplyer, 1.0f, 100.0f, 1.0f, 128, "Sun Multiplier");
-                            GUILayout.Space(4);
                             Main.settings.Direct_Dimmer = RGUI.SliderFloat(Main.settings.Direct_Dimmer, 0.0f, 20.0f, 1.0f, 98, "Sun Dimmer");
                         }
                         GUILayout.EndVertical();
-                        GUILayout.Space(4);
                         GUILayout.Label("<b>Colour</b>");
                         GUILayout.BeginVertical();
                         {
                             Main.settings.Direct_Color_R = RGUI.SliderFloat(Main.settings.Direct_Color_R, 0.0f, 1.0f, 1.0f, 24, "R");
-                            GUILayout.Space(2);
                             Main.settings.Direct_Color_G = RGUI.SliderFloat(Main.settings.Direct_Color_G, 0.0f, 1.0f, 1.0f, 24, "G");
-                            GUILayout.Space(2);
                             Main.settings.Direct_Color_B = RGUI.SliderFloat(Main.settings.Direct_Color_B, 0.0f, 1.0f, 1.0f, 24, "B");
                         }
                         GUILayout.EndVertical();
@@ -311,18 +302,18 @@ namespace AliceMod
                 return;
 
             GUILayout.BeginVertical("Box");
-            if (RGUI.Button(Main.settings.isCustomSkyactive, "Custom Skys"))
+            if (RGUI.Button(Main.settings.Sky_CustomSky_Enabled, "Custom Skys"))
             {
-                Main.settings.isCustomSkyactive = !Main.settings.isCustomSkyactive;
+                Main.settings.Sky_CustomSky_Enabled = !Main.settings.Sky_CustomSky_Enabled;
             }
-            switch (Main.settings.isCustomSkyactive)
+            switch (Main.settings.Sky_CustomSky_Enabled)
             {
                 case true:
                     Main.skyController.skyVolumeObj.SetActive(true);
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Label("<b>Skybox Type: </b>");
-                    Main.settings.SkyState = RGUI.SelectionPopup(Main.settings.SkyState, Main.skyController.SkyStates);
+                    Main.settings.Sky_State = RGUI.SelectionPopup(Main.settings.Sky_State, Main.skyController.SkyStates);
                     GUILayout.EndHorizontal();
 
                     GUILayout.BeginVertical("Box");
@@ -338,7 +329,7 @@ namespace AliceMod
                     Main.settings.Sky_IndirectSpecular = RGUI.SliderFloat(Main.settings.Sky_IndirectSpecular, -1.0f, 4.0f, 1.0f, 100, "Indirect Specular");
                     Main.settings.Sky_Temp = RGUI.SliderFloat(Main.settings.Sky_Temp, -20.0f, 20.0f, -12.0f, 96, "Temperature");
                     Main.settings.Sky_Tint = RGUI.SliderFloat(Main.settings.Sky_Tint, -20.0f, 20.0f, 0.0f, 96, "Tint");
-                    GUILayout.EndVertical();              
+                    GUILayout.EndVertical();
                     break;
                 case false:
                     Main.skyController.skyVolumeObj.SetActive(false);
@@ -346,22 +337,79 @@ namespace AliceMod
             }
             GUILayout.EndVertical();
         }
-        private void VFXUI()
+        private void FXUI()
         {
-            Tabs(VFX_Tab, UIextensions.TabColorSwitch(VFX_Tab));
-            if (VFX_Tab.isClosed)
+            Tabs(FX_Tab, UIextensions.TabColorSwitch(FX_Tab));
+            if (FX_Tab.isClosed)
                 return;
-
-            GUILayout.BeginVertical();
-            if (RGUI.Button(Main.settings.MeshTrail_Enabled, "RGB Trail"))
+            GUILayout.BeginVertical("Box");
             {
-                Main.settings.MeshTrail_Enabled = !Main.settings.MeshTrail_Enabled;
+                Tabs(FX_GhostTab, UIextensions.TabColorSwitch(FX_GhostTab));
+                if (!FX_GhostTab.isClosed)
+                {
+                    GUILayout.BeginVertical("Box");
+                    {
+                        GUILayout.BeginHorizontal();
+                        {
+                            if (RGUI.Button(Main.meshTrail.MeshTrail_Enabled, "Ghost Trail"))
+                            {
+                                Main.meshTrail.MeshTrail_Enabled = !Main.meshTrail.MeshTrail_Enabled;
 
-                Main.rgbParticles.ToggleVFXObj(Main.settings.MeshTrail_Enabled);
-            }
-            if (RGUI.Button(Main.settings.MeshTrail_RandomColours, "Mesh Random Colours"))
-            {
-                Main.settings.MeshTrail_RandomColours = !Main.settings.MeshTrail_RandomColours;
+                                Main.rgbParticles.ToggleVFXObj(Main.meshTrail.MeshTrail_Enabled);
+                            }
+                            if (RGUI.Button(Main.meshTrail.MeshTrail_RandomColours, "Random Ghost Colours"))
+                            {
+                                Main.meshTrail.MeshTrail_RandomColours = !Main.meshTrail.MeshTrail_RandomColours;
+                            }
+                            GUILayout.FlexibleSpace();
+                        }
+                        GUILayout.EndHorizontal();
+
+                        GUILayout.BeginVertical("Box");
+                        {
+                            Main.settings.Mesh_DestroyDelay = RGUI.SliderFloat(Main.settings.Mesh_DestroyDelay, 0.0f, 4.0f, 2.0f, 120, "Destroy Delay");
+                            Main.settings.Mesh_RefreshRate = RGUI.SliderFloat(Main.settings.Mesh_RefreshRate, 0.0f, 1.0f, 0.2f, 120, "Refresh Rate");
+                            Main.settings.Shader_Float_FadeDuration = RGUI.SliderFloat(Main.settings.Shader_Float_FadeDuration, 0.0f, 4.0f, 1.0f, 120, "Fade Duration");
+                            Main.settings.Velocity_Threshold = RGUI.SliderFloat(Main.settings.Velocity_Threshold, 0.0f, 5.0f, 1.0f, 120, "Velocity Threshold");
+                            Main.settings.Shader_ColorIntensity = RGUI.SliderFloat(Main.settings.Shader_ColorIntensity, 0.0f, 2.0f, 0.75f, 120, "Colour Intensity");
+                        }
+                        GUILayout.EndVertical();
+                        GUILayout.Label("<b>Base Colour</b>");
+                        GUILayout.BeginVertical("Box");
+                        {
+                            Main.settings.Shader_BaseColor_R = RGUI.SliderFloat(Main.settings.Shader_BaseColor_R, 0.0f, 1.0f, 0.0f, 24, "R");
+                            Main.settings.Shader_BaseColor_G = RGUI.SliderFloat(Main.settings.Shader_BaseColor_G, 0.0f, 1.0f, 0.80f, 24, "G");
+                            Main.settings.Shader_BaseColor_B = RGUI.SliderFloat(Main.settings.Shader_BaseColor_B, 0.0f, 1.0f, 1.0f, 24, "B");
+                        }
+                        GUILayout.EndVertical();
+                        GUILayout.Label("<b>Dissolve Colour</b>");
+                        GUILayout.BeginVertical("Box");
+                        {
+                            Main.settings.Shader_DissolveColor_R = RGUI.SliderFloat(Main.settings.Shader_DissolveColor_R, 0.0f, 1.0f, 0.85f, 24, "R");
+                            Main.settings.Shader_DissolveColor_G = RGUI.SliderFloat(Main.settings.Shader_DissolveColor_G, 0.0f, 1.0f, 0.20f, 24, "G");
+                            Main.settings.Shader_DissolveColor_B = RGUI.SliderFloat(Main.settings.Shader_DissolveColor_B, 0.0f, 1.0f, 0.90f, 24, "B");
+                        }
+                        GUILayout.EndVertical();
+                    }
+                    GUILayout.EndVertical();
+                }
+
+                Tabs(FX_GrindSparks, UIextensions.TabColorSwitch(FX_GrindSparks));
+                if (!FX_GrindSparks.isClosed)
+                {
+                    GUILayout.BeginVertical("Box");
+                    {
+                        GUILayout.BeginHorizontal();
+                        {
+                            if (RGUI.Button(Main.settings.FX_Sparks_Enabled, "Grind Sparks"))
+                            {
+                                Main.settings.FX_Sparks_Enabled = !Main.settings.FX_Sparks_Enabled;
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                    GUILayout.EndVertical();
+                }
             }
             GUILayout.EndVertical();
         }

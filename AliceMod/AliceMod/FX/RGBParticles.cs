@@ -39,7 +39,7 @@ namespace AliceMod
             if (RGBTrailObj == null)
                 return;
 
-            if (Main.settings.MeshTrail_Enabled)
+            if (Main.meshTrail.MeshTrail_Enabled)
             {
                 RGBTrailObj.transform.position = PositionUtil.PlayerTransform().position;
             }
@@ -49,7 +49,7 @@ namespace AliceMod
             if (RGBTrail == null)
                 return;
 
-            if (Main.settings.MeshTrail_Enabled)
+            if (Main.meshTrail.MeshTrail_Enabled)
             {
                 if (PositionUtil.IsPlayerMoving())
                 {
