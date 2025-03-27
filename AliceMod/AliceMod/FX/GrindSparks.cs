@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static Rewired.ComponentControls.Effects.RotateAroundAxis;
 
 namespace AliceMod
 {
@@ -128,13 +127,13 @@ namespace AliceMod
         private void PopulatePSList()
         {
             PS_List.Clear();
-            PS_List.Add(Sparks_FrontTruck);
+            //PS_List.Add(Sparks_FrontTruck);
             foreach (ParticleSystem ps in FrontTruckObj.GetComponentsInChildren<ParticleSystem>())
             {
                 PS_List.Add(ps);
             }
-            PS_List.Add(Sparks_BackTruck);
-            foreach (ParticleSystem ps in Sparks_BackTruck.GetComponentsInChildren<ParticleSystem>())
+            //PS_List.Add(Sparks_BackTruck);
+            foreach (ParticleSystem ps in BackTruckObj.GetComponentsInChildren<ParticleSystem>())
             {
                 PS_List.Add(ps);
             }
