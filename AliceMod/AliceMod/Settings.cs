@@ -54,7 +54,7 @@ namespace AliceMod
         public float Shader_DissolveColor_B = 0.90f;
 
         public bool FX_Sparks_Enabled = false;
-
+        public bool FX_Sparks_SyncReplaySpeed = true;
         public void ResetLightSettings()
         {
             Lights_Color_R = 1.0f;

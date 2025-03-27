@@ -52,7 +52,7 @@ namespace AliceMod
         {
             if (BGColorRoutine == null)
             {
-                BGColorRoutine = StartCoroutine(ColorLoop.BG_RGBColorLoop());
+                BGColorRoutine = StartCoroutine(ColorLoop.RGBColorLoop(this));
             }
         }
         public void StopBGColorRoutine()
@@ -66,7 +66,7 @@ namespace AliceMod
         private void Start()
         {
             StartCoroutine(WaitForInput());
-            ColorLoop.BG_colorSetter = this;
+            //ColorLoop.BG_colorSetter = this;
         }
         private void OnDestroy()
         {
@@ -141,13 +141,13 @@ namespace AliceMod
             SkyUI();
             FXUI();
         }
-        public void SetColor(Color color)
+        public void SetColor(Color color) // IcolorSetter
         {
             BGColor = color;
         }
         private void MainUI()
         {
-            GUILayout.Label("Alice Mod v0.0.2");
+            GUILayout.Label($"Alice Mod {Main.version}");
         }
         private void LightsUI()
         {
@@ -404,7 +404,14 @@ namespace AliceMod
                             if (RGUI.Button(Main.settings.FX_Sparks_Enabled, "Grind Sparks"))
                             {
                                 Main.settings.FX_Sparks_Enabled = !Main.settings.FX_Sparks_Enabled;
+
+                                Main.grindSparks.ToggleSparkObjects(Main.settings.FX_Sparks_Enabled);
                             }
+                            if (RGUI.Button(Main.settings.FX_Sparks_SyncReplaySpeed, "Sync Replay Speed"))
+                            {
+                                Main.settings.FX_Sparks_SyncReplaySpeed = !Main.settings.FX_Sparks_SyncReplaySpeed;
+                            }
+                            GUILayout.FlexibleSpace();
                         }
                         GUILayout.EndHorizontal();
                     }

@@ -144,7 +144,6 @@
     <Compile Include="AliceMod\UI\UIExtensions.cs" />
     <Compile Include="AliceMod\FX\RGBParticles.cs" />
     <Compile Include="AliceMod\Utils\MaterialUtil.cs" />
-    <Compile Include="AliceMod\Utils\CollisionUtil.cs" />
     <Compile Include="AliceMod\Utils\ParticleSystemTracker.cs" />
     <Compile Include="AliceMod\Utils\PositionUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

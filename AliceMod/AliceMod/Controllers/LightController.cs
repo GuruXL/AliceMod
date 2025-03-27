@@ -40,7 +40,7 @@ namespace AliceMod
         }
         private void SetUpInterfaces()
         {
-            ColorLoop.colorSetter = this;
+            //ColorLoop.colorSetter = this;
         }
         public void Update()
         {
@@ -79,11 +79,11 @@ namespace AliceMod
             {
                 if (ColorLoop.randomColors)
                 {
-                    RGBRoutine = StartCoroutine(ColorLoop.RGBRandomColorLoop());
+                    RGBRoutine = StartCoroutine(ColorLoop.RGBRandomColorLoop(this));
                 }
                 else
                 {
-                    RGBRoutine = StartCoroutine(ColorLoop.RGBColorLoop());
+                    RGBRoutine = StartCoroutine(ColorLoop.RGBColorLoop(this));
                 }
                 Main.Logger.Log($"RGB Color Loop Started - random colors: {ColorLoop.randomColors}");
             }

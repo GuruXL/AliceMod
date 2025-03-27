@@ -47,7 +47,7 @@ namespace AliceMod
 
             Sky_shanghai = bundle.LoadAsset<Cubemap>("shanghai4k");
             RGB_Trail_asset = bundle.LoadAsset<VisualEffectAsset>("RGBTrailV2");
-            FX_SparksPrefab = bundle.LoadAsset<GameObject>("SparksV2");
+            FX_SparksPrefab = bundle.LoadAsset<GameObject>("SparksV3");
             Mesh_HoloShader = bundle.LoadAsset<Shader>("MeshTrail");
             Mesh_HoloMaterial = bundle.LoadAsset<Material>("MeshTrailv2");
             Mesh_Holotexture = bundle.LoadAsset<Texture2D>("hologramtexture");

@@ -53,11 +53,11 @@ namespace AliceMod
                     transform.rotation = tracker.rotation[index];
                     transform.position = tracker.position[index];
 
-                    if (tracker.isPlaying[index])
+                    if (tracker.isPlaying[index] && !particleSystem.isEmitting)
                     {
                         particleSystem.Play();
                     }
-                    else if (!tracker.isPlaying[index])
+                    else if (!tracker.isPlaying[index] && particleSystem.isEmitting)
                     {
                         particleSystem.Stop();
                     }
