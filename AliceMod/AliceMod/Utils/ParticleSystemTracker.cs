@@ -76,21 +76,21 @@ namespace AliceMod
         int GetFrame()
         {
             float currentTime = ReplayEditorController.Instance.playbackController.CurrentTime;
-            int low = 0;
-            int high = tracker.time.Count - 1;
+            int min = 0;
+            int max = tracker.time.Count - 1;
             int result = -1;
 
-            while (low <= high)
+            while (min <= max)
             {
-                int mid = (low + high) / 2;
-                if (tracker.time[mid] < currentTime)
+                int i = (min + max) / 2;
+                if (tracker.time[i] < currentTime)
                 {
-                    low = mid + 1;
+                    min = i + 1;
                 }
                 else
                 {
-                    result = mid;
-                    high = mid - 1;
+                    result = i;
+                    max = i - 1;
                 }
             }
             return result;

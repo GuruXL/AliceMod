@@ -119,7 +119,6 @@ public class PerParticleColor : MonoBehaviour
             SetMaterialColor(renderer, colors.startColor, colors.endColor);
         }
     }
-    // Optionally, reset all particle systems
     public void ResetAllToDefault()
     {
         foreach (ParticleSystemRenderer renderer in particleRenderers)
@@ -139,22 +138,17 @@ public class PerParticleColor : MonoBehaviour
     {
         ParticleSystem.Particle[] particles = new ParticleSystem.Particle[particlesystem.main.maxParticles];
 
-        // Get active particles
         int numParticlesAlive = particlesystem.GetParticles(particles);
         for (int i = 0; i < numParticlesAlive; i++)
         {
             //Color randomColor = new Color( Random.value, Random.value, Random.value );
             //Color32 randomColor = new Color32( (byte)Random.Range(0, 256),(byte)Random.Range(0, 256),(byte)Random.Range(0, 256), 255);
-            Color randomColor = new Color(
-                Mathf.LinearToGammaSpace(Random.value),
-                Mathf.LinearToGammaSpace(Random.value), 
-                Mathf.LinearToGammaSpace(Random.value)
-                ,1.0f);
+            //Color randomColor = new Color( Mathf.LinearToGammaSpace(Random.value), Mathf.LinearToGammaSpace(Random.value),  Mathf.LinearToGammaSpace(Random.value), 1.0f);
+            Color randomColor = new Color( Mathf.GammaToLinearSpace(Random.value), Mathf.GammaToLinearSpace(Random.value), Mathf.GammaToLinearSpace(Random.value), 1.0f);
 
            particles[i].startColor = randomColor;
         }
 
-        // Apply the modified particle array back to the system
         particlesystem.SetParticles(particles, numParticlesAlive);
     }
     private IEnumerator RGBColorLoop()
@@ -169,10 +163,8 @@ public class PerParticleColor : MonoBehaviour
             Color rgbColor = new Color(r, g, b, 1f);
 
             SetAllStartColor(rgbColor);
-            // Wait one frame
             yield return null;
 
-            // Increment 't' to move through the ping-pong cycle
             t += Time.deltaTime / Mathf.Max(0.01f, RGB_duration);
         }
         yield return null;

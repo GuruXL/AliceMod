@@ -29,10 +29,10 @@ namespace AliceMod
         public static void SetMaterialColor(Color newColor, Material mat, string shadercolorName, float intensity) 
         {
             Color color = new Color(
-                newColor.r * intensity,
-                newColor.g * intensity,
-                newColor.b * intensity
-                );
+              Mathf.GammaToLinearSpace(newColor.r) * intensity,
+              Mathf.GammaToLinearSpace(newColor.g) * intensity,
+              Mathf.GammaToLinearSpace(newColor.b) * intensity,
+              1.0f);
             mat.SetColor(shadercolorName, color);
         }
         public static void SetRandomMaterialColor(Material mat, string shadercolorName, float intensity)
@@ -42,11 +42,11 @@ namespace AliceMod
         }
         private static Color GetRandomColor(float intensity)
         {
-            return new Color(
-                UnityEngine.Random.value * intensity,
-                UnityEngine.Random.value * intensity,
-                UnityEngine.Random.value * intensity
-            );
+            return  new Color(
+                   Mathf.GammaToLinearSpace(UnityEngine.Random.value) * intensity,
+                   Mathf.GammaToLinearSpace(UnityEngine.Random.value) * intensity,
+                   Mathf.GammaToLinearSpace(UnityEngine.Random.value) * intensity,
+                   1.0f);
         }
     }
 }
