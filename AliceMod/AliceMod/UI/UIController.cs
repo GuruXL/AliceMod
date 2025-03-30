@@ -5,6 +5,7 @@ using System;
 using AliceMod;
 using static RootMotion.Dynamics.RagdollCreator.CreateJointParams;
 using System.Runtime.InteropServices;
+using Mono.Cecil;
 
 namespace AliceMod
 {
@@ -52,7 +53,7 @@ namespace AliceMod
         {
             if (BGColorRoutine == null)
             {
-                BGColorRoutine = StartCoroutine(ColorLoop.RGBColorLoop(this));
+                BGColorRoutine = StartCoroutine(ColorLoop.RGBColorLoop(this, () => Main.settings.BG_RGB_Duration));
             }
         }
         public void StopBGColorRoutine()
@@ -197,13 +198,15 @@ namespace AliceMod
                     GUILayout.Space(8);
                     GUILayout.BeginHorizontal();
                     {
-                        if (RGUI.Button(ColorLoop.isRGBActive, "RGB Lights", GUILayout.Width(128)))
+                        if (RGUI.Button(ColorLoop.RGB_Lights_Active, "RGB Lights"))
                         {
-                            ColorLoop.isRGBActive = !ColorLoop.isRGBActive;
+                            ColorLoop.RGB_Lights_Active = !ColorLoop.RGB_Lights_Active;
 
-                            if (ColorLoop.isRGBActive)
+                            if (ColorLoop.RGB_Lights_Active)
                             {
-                                Main.lightController.StartRGBRoutine();
+                                Main.lightController.StopRGBRoutine();
+                                Main.lightController.StartRGBRoutine(ColorLoop.RGBColorLoop(Main.lightController.ColorSetter, () => Main.settings.RGB_Duration));
+                                ColorLoop.RGB_Lights_Random = false;
                             }
                             else
                             {
@@ -211,22 +214,31 @@ namespace AliceMod
                                 Main.lightController.ResetDefaultLightValues();
                             }
                         }
+                        if (RGUI.Button(ColorLoop.RGB_Lights_Random, "RGB Random Colors"))
+                        {
+                            ColorLoop.RGB_Lights_Random = !ColorLoop.RGB_Lights_Random;
+
+                            if (ColorLoop.RGB_Lights_Random)
+                            {
+                                Main.lightController.StopRGBRoutine();
+                                Main.lightController.StartRGBRoutine(ColorLoop.RGBRandomColorLoop(Main.lightController.ColorSetter, () => Main.settings.RGB_Duration));
+                                ColorLoop.RGB_Lights_Active = false;
+                            }
+                            else
+                            {
+                                Main.lightController.StopRGBRoutine();
+                                Main.lightController.ResetDefaultLightValues();
+                            }
+                        }
+                        GUILayout.FlexibleSpace();
                     }
                     GUILayout.EndHorizontal();
-                    if (ColorLoop.isRGBActive)
+                    if (ColorLoop.RGB_Lights_Active || ColorLoop.RGB_Lights_Random)
                     {
                         GUILayout.BeginVertical("Box");
                         {
                             GUILayout.BeginHorizontal();
                             {
-                                if (RGUI.Button(ColorLoop.randomColors, "Random Colors", GUILayout.Width(156)))
-                                {
-                                    ColorLoop.randomColors = !ColorLoop.randomColors;
-
-                                    // restart the loop after button press. loop checks for randomColors bool
-                                    Main.lightController.StopRGBRoutine();
-                                    Main.lightController.StartRGBRoutine();
-                                }
                                 if (RGUI.Button(Main.settings.RGB_Sun_Active, "RGB Sun", GUILayout.Width(128)))
                                 {
                                     Main.settings.RGB_Sun_Active = !Main.settings.RGB_Sun_Active;
@@ -259,6 +271,8 @@ namespace AliceMod
                         }
                         GUILayout.EndVertical();
                         GUILayout.Label("<b>Colour</b>");
+                        Color color = new Color(Main.settings.Lights_Color_R, Main.settings.Lights_Color_G, Main.settings.Lights_Color_B);
+                        UIextensions.ColorBox(color, 60, 10);
                         GUILayout.BeginVertical();
                         {
                             Main.settings.Lights_Color_R = RGUI.SliderFloat(Main.settings.Lights_Color_R, 0.0f, 1.0f, 1.0f, 24, "R");
@@ -282,6 +296,8 @@ namespace AliceMod
                         }
                         GUILayout.EndVertical();
                         GUILayout.Label("<b>Colour</b>");
+                        Color color = new Color(Main.settings.Direct_Color_R, Main.settings.Direct_Color_G, Main.settings.Direct_Color_B);
+                        UIextensions.ColorBox(color, 60, 10);
                         GUILayout.BeginVertical();
                         {
                             Main.settings.Direct_Color_R = RGUI.SliderFloat(Main.settings.Direct_Color_R, 0.0f, 1.0f, 1.0f, 24, "R");
@@ -371,10 +387,12 @@ namespace AliceMod
                             Main.settings.Mesh_RefreshRate = RGUI.SliderFloat(Main.settings.Mesh_RefreshRate, 0.0f, 1.0f, 0.2f, 120, "Refresh Rate");
                             Main.settings.Shader_Float_FadeDuration = RGUI.SliderFloat(Main.settings.Shader_Float_FadeDuration, 0.0f, 4.0f, 1.0f, 120, "Fade Duration");
                             Main.settings.Velocity_Threshold = RGUI.SliderFloat(Main.settings.Velocity_Threshold, 0.0f, 5.0f, 1.0f, 120, "Velocity Threshold");
-                            Main.settings.Shader_ColorIntensity = RGUI.SliderFloat(Main.settings.Shader_ColorIntensity, 0.0f, 2.0f, 0.75f, 120, "Colour Intensity");
+                            Main.settings.Shader_ColorIntensity = RGUI.SliderFloat(Main.settings.Shader_ColorIntensity, 0.0f, 4.0f, 1.0f, 120, "Colour Intensity");
                         }
                         GUILayout.EndVertical();
                         GUILayout.Label("<b>Base Colour</b>");
+                        Color basecolor = new Color(Main.settings.Shader_BaseColor_R, Main.settings.Shader_BaseColor_G, Main.settings.Shader_BaseColor_B);
+                        UIextensions.ColorBox(basecolor, 60, 10);
                         GUILayout.BeginVertical("Box");
                         {
                             Main.settings.Shader_BaseColor_R = RGUI.SliderFloat(Main.settings.Shader_BaseColor_R, 0.0f, 1.0f, 0.0f, 24, "R");
@@ -383,6 +401,8 @@ namespace AliceMod
                         }
                         GUILayout.EndVertical();
                         GUILayout.Label("<b>Dissolve Colour</b>");
+                        Color dissolvecolor = new Color(Main.settings.Shader_DissolveColor_R, Main.settings.Shader_DissolveColor_G, Main.settings.Shader_DissolveColor_B);
+                        UIextensions.ColorBox(dissolvecolor, 60, 10);
                         GUILayout.BeginVertical("Box");
                         {
                             Main.settings.Shader_DissolveColor_R = RGUI.SliderFloat(Main.settings.Shader_DissolveColor_R, 0.0f, 1.0f, 0.85f, 24, "R");
@@ -414,6 +434,113 @@ namespace AliceMod
                             GUILayout.FlexibleSpace();
                         }
                         GUILayout.EndHorizontal();
+                        GUILayout.BeginVertical();
+                        {
+                            GUILayout.Label("Spawn Position");
+                            Main.settings.FX_Sparks_SpawnPoint = RGUI.SelectionPopup(Main.settings.FX_Sparks_SpawnPoint, Main.grindSparks.SpawnPoints);
+                        }
+                        GUILayout.EndVertical();
+                        if (Main.settings.FX_Sparks_Enabled)
+                        {
+                            GUILayout.BeginVertical("Box");
+                            {
+                                GUILayout.BeginHorizontal();
+                                {
+                                    if (RGUI.Button(ColorLoop.RGB_FX_Active, "RGB Loop"))
+                                    {
+                                        ColorLoop.RGB_FX_Active = !ColorLoop.RGB_FX_Active;
+
+                                        if (Main.settings.FX_Sparks_SetCustomColor)
+                                        {
+                                            Main.settings.FX_Sparks_SetCustomColor = false;
+                                        }
+                                        if (ColorLoop.RGB_FX_Active)
+                                        {
+                                            Main.grindSparks.StopRGBRoutine();
+                                            Main.grindSparks.StartRGBRoutine(ColorLoop.RGBColorLoop(Main.grindSparks.ColorSetter, () => Main.settings.FX_Sparks_RGBDuration));
+                                            ColorLoop.RGB_FX_Random = false;
+                                        }
+                                        else
+                                        {
+                                            Main.grindSparks.StopRGBRoutine();
+                                        }
+
+                                    }
+                                    if (RGUI.Button(ColorLoop.RGB_FX_Random, "RGB Random Loop"))
+                                    {
+                                        ColorLoop.RGB_FX_Random = !ColorLoop.RGB_FX_Random;
+
+                                        if (Main.settings.FX_Sparks_SetCustomColor)
+                                        {
+                                            Main.settings.FX_Sparks_SetCustomColor = false;
+                                        }
+                                        if (ColorLoop.RGB_FX_Random)
+                                        {
+                                            Main.grindSparks.StopRGBRoutine();
+                                            Main.grindSparks.StartRGBRoutine(ColorLoop.RGBRandomColorLoop(Main.grindSparks.ColorSetter, () => Main.settings.FX_Sparks_RGBDuration));
+                                            ColorLoop.RGB_FX_Active = false;
+                                        }
+                                        else
+                                        {
+                                            Main.grindSparks.StopRGBRoutine();
+                                        }
+                                    }
+                                    GUILayout.FlexibleSpace();
+                                }
+                                GUILayout.EndHorizontal();
+                                GUILayout.BeginVertical();
+                                {
+                                    Main.settings.FX_Sparks_RGBDuration = RGUI.SliderFloat(Main.settings.FX_Sparks_RGBDuration, 0.1f, 5.0f, 0.5f, 96, "RGB duration");
+                                    Main.settings.FX_Sparks_EmissionMultiplier = RGUI.SliderFloat(Main.settings.FX_Sparks_EmissionMultiplier, 1.0f, 10.0f, 1.0f, 128, "Emission Multiplier");
+                                    Main.settings.FX_Sparks_SpawnRate = RGUI.SliderFloat(Main.settings.FX_Sparks_SpawnRate, 10.0f, 500.0f, 200.0f, 128, "Spawn Rate");
+                                }
+                                GUILayout.EndVertical();
+                            }
+                            GUILayout.EndVertical();
+                        }
+                        GUILayout.BeginVertical("Box");
+                        {
+                            GUILayout.BeginHorizontal();
+                            {
+                                if (RGUI.Button(Main.settings.FX_Sparks_SetCustomColor, "Custom Color"))
+                                {
+                                    Main.settings.FX_Sparks_SetCustomColor = !Main.settings.FX_Sparks_SetCustomColor;
+
+                                    if (Main.settings.FX_Sparks_SetCustomColor)
+                                    {
+                                        if (ColorLoop.RGB_FX_Active || ColorLoop.RGB_FX_Random)
+                                        {
+                                            Main.grindSparks.StopRGBRoutine();
+                                            ColorLoop.RGB_FX_Active = false;
+                                            ColorLoop.RGB_FX_Random = false;
+                                        }
+                                        Main.grindSparks.SetMatColorToWhite();
+                                        Main.grindSparks.Sparks_Color = Color.white;
+                                    }
+                                    else
+                                    {
+                                        Main.grindSparks.ResetAllMatsToDefault();
+                                    }
+                                }
+                                GUILayout.FlexibleSpace();
+                            }  
+                            GUILayout.EndHorizontal();
+                            if (Main.settings.FX_Sparks_SetCustomColor)
+                            {
+                                GUILayout.Label("<b>Colour</b>");
+                                Color color = new Color(Main.settings.FX_Sparks_Color_R, Main.settings.FX_Sparks_Color_G, Main.settings.FX_Sparks_Color_B);
+                                UIextensions.ColorBox(color, 60, 10);
+                                GUILayout.BeginVertical();
+                                {
+                                    Main.settings.FX_Sparks_Color_R = RGUI.SliderFloat(Main.settings.FX_Sparks_Color_R, 0.0f, 1.0f, 1.0f, 24, "R");
+                                    Main.settings.FX_Sparks_Color_G = RGUI.SliderFloat(Main.settings.FX_Sparks_Color_G, 0.0f, 1.0f, 1.0f, 24, "G");
+                                    Main.settings.FX_Sparks_Color_B = RGUI.SliderFloat(Main.settings.FX_Sparks_Color_B, 0.0f, 1.0f, 1.0f, 24, "B");
+                                }
+                                GUILayout.EndVertical();
+                            }            
+                        }
+                        GUILayout.EndVertical();
+                        
                     }
                     GUILayout.EndVertical();
                 }

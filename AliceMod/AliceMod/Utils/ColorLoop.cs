@@ -6,13 +6,12 @@ namespace AliceMod
 {
     public static class ColorLoop
     {
-        //public static IColorSetter colorSetter;
-        //public static IColorSetter BG_colorSetter;
+        public static bool RGB_Lights_Active = false;
+        public static bool RGB_Lights_Random = false;
+        public static bool RGB_FX_Active = false;
+        public static bool RGB_FX_Random = false;
 
-        public static bool isRGBActive = false;
-        public static bool randomColors = false;
-
-        public static IEnumerator RGBColorLoop(IColorSetter colorSetter)
+        public static IEnumerator RGBColorLoop(IColorSetter colorSetter, Func<float> getDuration)
         {
             yield return null;
 
@@ -30,12 +29,12 @@ namespace AliceMod
                 //Main.Logger.Log($"Color: {rgbColor}");
 
                 yield return null;
-                float duration = Mathf.Max(0.1f, Main.settings.RGB_Duration);
-                t += Time.deltaTime / duration;
+                float speed = Mathf.Max(0.1f, getDuration());
+                t += Time.deltaTime / speed;
             }
         }
 
-        public static IEnumerator RGBRandomColorLoop(IColorSetter colorSetter)
+        public static IEnumerator RGBRandomColorLoop(IColorSetter colorSetter, Func<float> getDuration)
         {
             yield return null;
 
@@ -44,21 +43,24 @@ namespace AliceMod
             while (true)
             {
                 Color startColor = LastColor;
-                var endColor = new Color32(
+                Color32 endColor = new Color32(
                     (byte)UnityEngine.Random.Range(0, 256),
                     (byte)UnityEngine.Random.Range(0, 256),
                     (byte)UnityEngine.Random.Range(0, 256),
-                    255
-                );
+                    255);
+                //Color endColor = new Color(
+                    //Mathf.GammaToLinearSpace(UnityEngine.Random.value),
+                    //Mathf.GammaToLinearSpace(UnityEngine.Random.value),
+                    //Mathf.GammaToLinearSpace(UnityEngine.Random.value),
+                    //1.0f);
 
                 float t = 0;
-
-                // transition from startColor to endColor
                 while (t < 1)
                 {
-                    float duration = Mathf.Max(0.1f, Main.settings.RGB_Duration);
-                    t += Time.deltaTime / duration;
+                    float speed = Mathf.Max(0.1f, getDuration());
+                    t += Time.deltaTime / speed;
                     Color currentColor = Color.Lerp(startColor, endColor, t);
+                    //Color currentColor = Color.LerpUnclamped(startColor, endColor, t);
 
                     colorSetter?.SetColor(currentColor);
 

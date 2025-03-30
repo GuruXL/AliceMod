@@ -33,7 +33,7 @@ namespace AliceMod
 
         private readonly string Shader_FloatName = "_Alpha";
         private readonly string Shader_BaseColorName = "_BaseColour";
-        private readonly string Shader_DissolveColorName = "_DissolveEdgeColour";      
+        private readonly string Shader_DissolveColorName = "_DissolveEdgeColour";
 
         void Start()
         {

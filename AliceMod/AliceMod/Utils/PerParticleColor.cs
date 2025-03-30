@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+/*
 public struct ParticleDefaultColors
 {
     public Color startColor;
@@ -170,3 +171,4 @@ public class PerParticleColor : MonoBehaviour
         yield return null;
     }
 }
+*/

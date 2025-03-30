@@ -8,6 +8,7 @@ namespace AliceMod
     public class LightController : MonoBehaviour, IColorSetter
     {
         private Coroutine RGBRoutine;
+        public IColorSetter ColorSetter;
         public bool lightsFound { get; private set; } = false;
         public bool directLightsFound { get; private set; } = false;
 
@@ -17,7 +18,7 @@ namespace AliceMod
         private Dictionary<Light, float> Default_Lights_Intensity = new Dictionary<Light, float>();
         private Dictionary<Light, float> Default_Lights_Range = new Dictionary<Light, float>();
 
-        private Color Lights_Color = new Color(1.0f, 1.0f, 1.0f);
+        public Color Lights_Color { get; private set; } = new Color(1.0f, 1.0f, 1.0f);
 
         private float Lights_lastMultiplier = 1.0f;
         private float Lights_lastDimmer = 1.0f;
@@ -29,18 +30,14 @@ namespace AliceMod
         private Dictionary<Light, Color> Default_Direct_Colors = new Dictionary<Light, Color>();
         private Dictionary<Light, float> Default_Direct_Intensity = new Dictionary<Light, float>();
 
-        private Color Direct_Color = new Color(1.0f, 1.0f, 1.0f);
+        public Color Direct_Color { get; private set; } = new Color(1.0f, 1.0f, 1.0f);
 
         private float Direct_lastMultiplier = 1.0f;
         private float Direct_lastDimmer = 1.0f;
 
         public void Start()
         {
-            SetUpInterfaces();
-        }
-        private void SetUpInterfaces()
-        {
-            //ColorLoop.colorSetter = this;
+            ColorSetter = this;
         }
         public void Update()
         {
@@ -72,18 +69,33 @@ namespace AliceMod
                 light.color = color;
             }
         }
-     
+        public void StartRGBRoutine(IEnumerator routine)
+        {
+            if (RGBRoutine == null)
+            {
+                RGBRoutine = StartCoroutine(routine);
+            }
+        }
+        public void StopRGBRoutine()
+        {
+            if (RGBRoutine != null)
+            {
+                StopCoroutine(RGBRoutine);
+                RGBRoutine = null;
+            }
+        }
+        /*
         public void StartRGBRoutine()
         {
             if (RGBRoutine == null)
             {
                 if (ColorLoop.randomColors)
                 {
-                    RGBRoutine = StartCoroutine(ColorLoop.RGBRandomColorLoop(this));
+                    RGBRoutine = StartCoroutine(ColorLoop.RGBRandomColorLoop(this, Main.settings.RGB_Duration));
                 }
                 else
                 {
-                    RGBRoutine = StartCoroutine(ColorLoop.RGBColorLoop(this));
+                    RGBRoutine = StartCoroutine(ColorLoop.RGBColorLoop(this, Main.settings.BG_RGB_Duration));
                 }
                 Main.Logger.Log($"RGB Color Loop Started - random colors: {ColorLoop.randomColors}");
             }
@@ -97,6 +109,7 @@ namespace AliceMod
                 Main.Logger.Log("RGB Color Loop Stopped");
             }
         }
+        */
         private bool CheckLightsFound(List<Light> lights)
         {
             if (lights != null && lights.Count >= 1)
@@ -268,12 +281,11 @@ namespace AliceMod
 
             Color newColor = new Color(Main.settings.Lights_Color_R, Main.settings.Lights_Color_G, Main.settings.Lights_Color_B);
 
-            if (Mathf.Approximately(Lights_Color.r, newColor.r) ||
-                Mathf.Approximately(Lights_Color.g, newColor.g) ||
-                Mathf.Approximately(Lights_Color.b, newColor.b))
+            if (!Mathf.Approximately(Lights_Color.r, newColor.r) ||
+                !Mathf.Approximately(Lights_Color.g, newColor.g) ||
+                !Mathf.Approximately(Lights_Color.b, newColor.b))
             {
                 SetLightColor(newColor, lights);
-
                 Lights_Color = newColor;
             }
         }
@@ -353,9 +365,9 @@ namespace AliceMod
 
             Color newColor = new Color(Main.settings.Direct_Color_R, Main.settings.Direct_Color_G, Main.settings.Direct_Color_B);
 
-            if (Mathf.Approximately(Direct_Color.r, newColor.r) ||
-                Mathf.Approximately(Direct_Color.g, newColor.g) ||
-                Mathf.Approximately(Direct_Color.b, newColor.b))
+            if (!Mathf.Approximately(Direct_Color.r, newColor.r) ||
+                !Mathf.Approximately(Direct_Color.g, newColor.g) ||
+                !Mathf.Approximately(Direct_Color.b, newColor.b))
             {
                 SetLightColor(newColor, directLights);
 

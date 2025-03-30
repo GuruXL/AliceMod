@@ -7,34 +7,51 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Android;
+using static RootMotion.Dynamics.RagdollCreator.CreateJointParams;
 
 namespace AliceMod
 {
-    public struct ParticleDefaultColors
+    public struct ParticleMatDefaults
     {
         public Color startColor;
         public Color endColor;
+        public float emission;
     }
-    public class GrindSparks : MonoBehaviour
+    public class GrindSparks : MonoBehaviour, IColorSetter
     {
+        private Coroutine PS_RGBRoutine;
+
+        public IColorSetter ColorSetter;
+        public Color Sparks_Color = Color.white;
         private readonly string _start_Color = "_StartColor";
         private readonly string _end_Color = "_EndColor";
+        private readonly string _emission = "_Emission";
+        private readonly string[] _spawnPoints = new string[2] { Trucks, ContactPoint };
+        private const string Trucks = "Trucks";
+        private const string ContactPoint = "ContactPoint";
+        public string[] SpawnPoints => _spawnPoints;
 
         GameObject FrontTruckObj;
         GameObject BackTruckObj;
         ParticleSystem Sparks_FrontTruck;
         ParticleSystem Sparks_BackTruck;
 
+        private float last_EmissionMultiplier = 1.0f;
+        private float last_SpawnRate = 200.0f;
+
         List<ParticleSystem> PS_List = new List<ParticleSystem>();
         List<ParticleSystem.MainModule> PS_MainModules = new List<ParticleSystem.MainModule>();
+        List<ParticleSystem.EmissionModule> PS_EmissionModules = new List<ParticleSystem.EmissionModule>();
         List<ParticleSystemRenderer> PS_Renderers = new List<ParticleSystemRenderer>();
-        private Dictionary<ParticleSystemRenderer, ParticleDefaultColors> defaultColors = new Dictionary<ParticleSystemRenderer, ParticleDefaultColors>();
+        private Dictionary<ParticleSystemRenderer, ParticleMatDefaults> PS_Defaults = new Dictionary<ParticleSystemRenderer, ParticleMatDefaults>();
 
         private float last_Timescale = 1.0f;
 
         private void Start()
         {
             StartCoroutine(GetPrefab());
+            ColorSetter = this;
 
             //PlayerController.Instance.boardController.triggerManager.grindContactPoint // maybe position to spawn sparks?
             //PlayerController.Instance.boardController.triggerManager.grindContactSplinePosition // maybe position to spawn sparks?
@@ -44,26 +61,6 @@ namespace AliceMod
             //PlayerController.Instance.boardController.triggerManager.backTruckCollision.isColliding
             //PlayerController.Instance.boardController.triggerManager.frontTruckCollision.isColliding
         }
-        /*
-        void Update()
-        {
-            if (RandomColorPerParticle)
-            {
-                SetMatColorToWhite();
-                PerParticleRGBLoop();
-            }
-            else if (RandomStartColor)
-            {
-                SetMatColorToWhite();
-                StartCoroutine(RGBColorLoop());
-            }
-            else
-            {
-                StopAllCoroutines();
-                ResetAllToDefault();
-            }
-        }
-        */
         private void Update()
         {
             if (!Main.settings.FX_Sparks_Enabled) return;
@@ -77,7 +74,6 @@ namespace AliceMod
                 {
                     UpdateFXPlaybackSpeed(1.0f);
                 }
-                
             }
             else if (GameStateMachine.Instance.CurrentState is ReplayState)
             {
@@ -85,6 +81,31 @@ namespace AliceMod
                 {
                     UpdateFXPlaybackSpeed(ReplayEditorController.Instance.playbackTimeScale);
                 }
+            }
+
+            if (Main.settings.FX_Sparks_SetCustomColor)
+            {
+                UpdateColor();
+            }
+            UpdateMatEmission();
+            UpdateSpawnRate();
+            
+        }
+        public void StartRGBRoutine(IEnumerator routine)
+        {
+            if (PS_RGBRoutine == null)
+            {
+                SetMatColorToWhite();
+                PS_RGBRoutine = StartCoroutine(routine);
+            }
+        }
+        public void StopRGBRoutine()
+        {
+            if (PS_RGBRoutine != null)
+            {
+                StopCoroutine(PS_RGBRoutine);
+                PS_RGBRoutine = null;
+                ResetAllMatsToDefault();
             }
         }
         private void UpdateFXPlaybackSpeed(float speed)
@@ -127,6 +148,46 @@ namespace AliceMod
             }
 
         }
+        private void UpdateColor()
+        {
+            if (PS_MainModules == null || PS_MainModules.Count <= 0) return;
+
+            Color newColor = new Color(Main.settings.FX_Sparks_Color_R, Main.settings.FX_Sparks_Color_G, Main.settings.FX_Sparks_Color_B);    
+
+            if (!Mathf.Approximately(Sparks_Color.r, newColor.r) ||
+                !Mathf.Approximately(Sparks_Color.g, newColor.g) ||
+                !Mathf.Approximately(Sparks_Color.b, newColor.b))
+            {
+                SetAllStartColor(newColor);
+                Sparks_Color = newColor;
+            }
+        }
+        private void UpdateMatEmission()
+        {
+            float Multiplier = Mathf.Max(1, Main.settings.FX_Sparks_EmissionMultiplier);
+
+            if (Mathf.Approximately(last_EmissionMultiplier, Multiplier))
+                return;
+
+            foreach (ParticleSystemRenderer renderer in PS_Renderers)
+            {
+                if (PS_Defaults.TryGetValue(renderer, out ParticleMatDefaults defaults))
+                {
+                    //SetPSMaterialEmission(renderer, defaults.emission * Multiplier);
+                    SetMatEmission(renderer, defaults.emission * Multiplier);
+                }
+            }
+            last_EmissionMultiplier = Multiplier;
+        }
+        private void UpdateSpawnRate()
+        {
+            if (Sparks_FrontTruck == null || Sparks_BackTruck == null
+                && Mathf.Approximately(last_SpawnRate, Main.settings.FX_Sparks_SpawnRate))
+                return;
+
+            SetSpawnRate(Sparks_FrontTruck, Main.settings.FX_Sparks_SpawnRate);
+            SetSpawnRate(Sparks_BackTruck, Main.settings.FX_Sparks_SpawnRate);
+        }
         private IEnumerator GetPrefab()
         {
             yield return new WaitUntil(() => AssetLoader.assetsLoaded);
@@ -152,8 +213,9 @@ namespace AliceMod
             Sparks_BackTruck = BackTruckObj?.GetComponent<ParticleSystem>();
             PopulatePSList();
             GetPSMainModules();
+            GetPSEmissionModules();
             GetPSRenderers();
-            CacheDefaultColors();
+            CacheDefaultMatValues();
         }
         private void PopulatePSList()
         {
@@ -170,23 +232,52 @@ namespace AliceMod
                 PS_MainModules.Add(ps.main);
             }
         }
+        private void GetPSEmissionModules()
+        {
+            if (PS_List.Count > 0)
+
+                foreach (ParticleSystem ps in PS_List)
+                {
+                    PS_EmissionModules.Add(ps.emission);
+                }
+        }
         private void GetPSRenderers()
         {
             PS_Renderers.AddRange(FrontTruckObj.GetComponentsInChildren<ParticleSystemRenderer>());
             PS_Renderers.AddRange(BackTruckObj.GetComponentsInChildren<ParticleSystemRenderer>());
         }
+        public void SetColor(Color color) // IColorSetter
+        {
+            SetAllStartColor(color);
+        }
         private void UpdateFXPosition()
         {
             if (FrontTruckObj != null && PlayerController.Instance.boardController.triggerManager.frontTruckCollision.isColliding)
             {
-                Vector3 frontTruckPos = PlayerController.Instance.boardController.frontTruckRigidbody.position + new Vector3 (0, -0.03f, 0);
-                FrontTruckObj.transform.position = frontTruckPos;
+                switch (Main.settings.FX_Sparks_SpawnPoint)
+                {
+                    case Trucks:
+                        Vector3 frontTruckPos = PlayerController.Instance.boardController.frontTruckRigidbody.position + new Vector3 (0, -0.03f, 0);
+                        FrontTruckObj.transform.position = frontTruckPos;
+                        break;
+                    case ContactPoint:
+                        FrontTruckObj.transform.position = PlayerController.Instance.boardController.triggerManager.frontTruckCollision.lastCollision;
+                        break;
+                }
                 FrontTruckObj.transform.forward = PlayerController.Instance.GetGrindDirection();
             }
             if (BackTruckObj != null && PlayerController.Instance.boardController.triggerManager.backTruckCollision.isColliding)
             {
-                Vector3 backTruckPos = PlayerController.Instance.boardController.backTruckRigidbody.position + new Vector3(0, -0.03f, 0);
-                BackTruckObj.transform.position = backTruckPos;
+                switch (Main.settings.FX_Sparks_SpawnPoint)
+                {
+                    case Trucks:
+                        Vector3 backTruckPos = PlayerController.Instance.boardController.backTruckRigidbody.position + new Vector3(0, -0.03f, 0);
+                        BackTruckObj.transform.position = backTruckPos;
+                        break;
+                    case ContactPoint:
+                        BackTruckObj.transform.position = PlayerController.Instance.boardController.triggerManager.backTruckCollision.lastCollision;
+                        break;
+                }
                 BackTruckObj.transform.forward = PlayerController.Instance.GetGrindDirection();
             }
         }
@@ -195,20 +286,26 @@ namespace AliceMod
             FrontTruckObj?.SetActive(enabled);
             BackTruckObj?.SetActive(enabled);
         }
-        void CacheDefaultColors()
+        void CacheDefaultMatValues()
         {
             foreach (ParticleSystemRenderer renderer in PS_Renderers)
             {
                 if (renderer == null) continue;
                 Material mat = renderer.sharedMaterial;
                 //Material mat = renderer.material;
-                ParticleDefaultColors colors = new ParticleDefaultColors
+                ParticleMatDefaults defaults = new ParticleMatDefaults
                 {
                     startColor = mat.GetColor(_start_Color),
-                    endColor = mat.GetColor(_end_Color)
+                    endColor = mat.GetColor(_end_Color),
+                    emission = mat.GetFloat(_emission)
                 };
-                defaultColors[renderer] = colors;
+                PS_Defaults[renderer] = defaults;
             }
+        }
+        private void SetSpawnRate(ParticleSystem ps, float rate)
+        {
+            ParticleSystem.EmissionModule emission = ps.emission;
+            emission.rateOverTimeMultiplier = rate;
         }
         public void SetMatColorToWhite()
         {
@@ -234,6 +331,11 @@ namespace AliceMod
             block.SetColor(_end_Color, endColor);
             renderer.SetPropertyBlock(block);
         }
+        public void SetMatEmission(ParticleSystemRenderer renderer, float emission)
+        {
+            Material mat = renderer.sharedMaterial;
+            mat.SetFloat(_emission, emission);
+        }
         private void SetAllStartColor(Color color)
         {
             for (int i = 0; i < PS_MainModules.Count; i++)
@@ -243,14 +345,14 @@ namespace AliceMod
                 main.startColor = color;
             }
         }
-        public void ResetMatToDefault(ParticleSystemRenderer renderer)
+        private void ResetMatToDefault(ParticleSystemRenderer renderer)
         {
-            if (defaultColors.TryGetValue(renderer, out ParticleDefaultColors colors))
+            if (PS_Defaults.TryGetValue(renderer, out ParticleMatDefaults defaults))
             {
-                SetPSMaterialColor(renderer, colors.startColor, colors.endColor);
+                SetPSMaterialColor(renderer, defaults.startColor, defaults.endColor);
             }
         }
-        public void ResetAllToDefault()
+        public void ResetAllMatsToDefault()
         {
             foreach (ParticleSystemRenderer renderer in PS_Renderers)
             {
@@ -258,6 +360,9 @@ namespace AliceMod
             }
             SetAllStartColor(Color.white);
         }
+
+        #region Per Particle Loop
+        /*
         private void PerParticleRGBLoop()
         {
             foreach (ParticleSystem ps in PS_List)
@@ -283,5 +388,7 @@ namespace AliceMod
 
             particlesystem.SetParticles(particles, numParticlesAlive);
         }
+        */
+        #endregion
     }
 }

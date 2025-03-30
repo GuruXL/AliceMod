@@ -44,7 +44,7 @@ namespace AliceMod
         public float Mesh_DestroyDelay = 2.0f;
         public float Mesh_RefreshRate = 0.2f;
         public float Shader_Float_FadeDuration = 1.0f;
-        public float Shader_ColorIntensity = 0.55f;
+        public float Shader_ColorIntensity = 1.0f;
         public float Velocity_Threshold = 1.0f;
         public float Shader_BaseColor_R = 0.0f;
         public float Shader_BaseColor_G = 0.80f;
@@ -55,6 +55,15 @@ namespace AliceMod
 
         public bool FX_Sparks_Enabled = false;
         public bool FX_Sparks_SyncReplaySpeed = true;
+        public bool FX_Sparks_SetCustomColor = false;
+        public string FX_Sparks_SpawnPoint = "Trucks";
+        public float FX_Sparks_RGBDuration = 0.5f;
+        public float FX_Sparks_Color_R = 1.0f;
+        public float FX_Sparks_Color_G = 1.0f;
+        public float FX_Sparks_Color_B = 1.0f;
+        public float FX_Sparks_EmissionMultiplier = 1.0f;
+        public float FX_Sparks_SpawnRate = 200.0f;
+
         public void ResetLightSettings()
         {
             Lights_Color_R = 1.0f;

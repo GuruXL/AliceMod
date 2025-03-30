@@ -24,7 +24,7 @@ namespace AliceMod
         {
             Main.lightController.GetLights();
 
-            if (ColorLoop.isRGBActive)
+            if (ColorLoop.RGB_Lights_Active)
             {
                 Main.lightController.StopRGBRoutine();
             }
