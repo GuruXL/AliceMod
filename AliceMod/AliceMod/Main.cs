@@ -14,7 +14,7 @@ namespace AliceMod
         public static bool enabled;
         public static Harmony harmonyInstance;
         public static string modId = "ReplayTestMod";
-        public static string version = "v0.0.4";
+        public static string version = "v0.0.5";
         public static UnityModManager.ModEntry modEntry;
         public static Settings settings;
         public static GameObject ScriptManager;

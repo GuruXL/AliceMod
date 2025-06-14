@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.LookDev;
 
 namespace AliceMod
 {
@@ -29,9 +30,19 @@ namespace AliceMod
 
         private const string none = "";
         private const string shanghai_sky = "shanghai";
+        private const string rooftop_sky = "rooftop";
+        private const string neuerzollhof_sky = "neuerzollhof";
+        private const string modernbuildings_sky = "modernbuildings";
+        private const string hansaplatz_sky = "hansaplatz";
+        private const string goldenbay_sky = "goldenbay";
 
         public string[] SkyStates = new string[] {
             shanghai_sky,
+            rooftop_sky,
+            neuerzollhof_sky,
+            modernbuildings_sky,
+            hansaplatz_sky,
+            goldenbay_sky,
             none,
         };
 
@@ -143,6 +154,21 @@ namespace AliceMod
             {
                 case shanghai_sky:
                     hdriSky.hdriSky.Override(AssetLoader.Sky_shanghai);
+                    break;
+                case rooftop_sky:
+                    hdriSky.hdriSky.Override(AssetLoader.Sky_rooftop_night);
+                    break;
+                case neuerzollhof_sky:
+                    hdriSky.hdriSky.Override(AssetLoader.Sky_neuer_zollhof);
+                    break;
+                case modernbuildings_sky:
+                    hdriSky.hdriSky.Override(AssetLoader.Sky_modern_buildings);
+                    break;
+                case hansaplatz_sky:
+                    hdriSky.hdriSky.Override(AssetLoader.Sky_hansaplatz);
+                    break;
+                case goldenbay_sky:
+                    hdriSky.hdriSky.Override(AssetLoader.Sky_golden_bay);
                     break;
                 case none:
                     break;

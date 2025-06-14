@@ -5,6 +5,7 @@ using System.Reflection;
 using System;
 using GameManagement;
 using UnityEngine.VFX;
+using UnityEngine.Rendering.LookDev;
 
 namespace AliceMod
 {
@@ -12,6 +13,11 @@ namespace AliceMod
     {
         public static AssetBundle bundle;
         public static Cubemap Sky_shanghai;
+        public static Cubemap Sky_rooftop_night;
+        public static Cubemap Sky_neuer_zollhof;
+        public static Cubemap Sky_modern_buildings;
+        public static Cubemap Sky_hansaplatz;
+        public static Cubemap Sky_golden_bay;
         public static VisualEffectAsset RGB_Trail_asset;
         public static Shader Mesh_HoloShader;
         public static Material Mesh_HoloMaterial;
@@ -46,6 +52,11 @@ namespace AliceMod
             }
 
             Sky_shanghai = bundle.LoadAsset<Cubemap>("shanghai4k");
+            Sky_rooftop_night = bundle.LoadAsset<Cubemap>("rooftop_night_4k");
+            Sky_neuer_zollhof = bundle.LoadAsset<Cubemap>("neuer_zollhof_4k");
+            Sky_modern_buildings = bundle.LoadAsset<Cubemap>("modern_buildings_night_4k");
+            Sky_hansaplatz = bundle.LoadAsset<Cubemap>("hansaplatz_4k");
+            Sky_golden_bay = bundle.LoadAsset<Cubemap>("golden_bay_4k");
             RGB_Trail_asset = bundle.LoadAsset<VisualEffectAsset>("RGBTrailV2");
             FX_SparksPrefab = bundle.LoadAsset<GameObject>("SparksV3");
             Mesh_HoloShader = bundle.LoadAsset<Shader>("MeshTrail");
@@ -54,6 +65,11 @@ namespace AliceMod
 
             // Check if all assets are loaded
             assetsLoaded = Sky_shanghai != null &&
+                           Sky_rooftop_night != null &&
+                           Sky_neuer_zollhof != null &&
+                           Sky_modern_buildings != null &&
+                           Sky_hansaplatz != null &&
+                           Sky_golden_bay != null &&
                            RGB_Trail_asset != null &&
                            FX_SparksPrefab != null &&
                            Mesh_HoloShader != null &&
